@@ -42,22 +42,28 @@ DEV → TEST → QA (Staging) → PROD
 
 ---
 ## **:chart_with_upwards_trend: Diagram Representation**
+
 ```mermaid
 graph TD;
-    A[DEV] -->|Code Testing| B[TEST];
-    B -->|Automated Tests| C[QA (Staging)];
-    C -->|Approval & Deployment| D[PROD];
-    D -->|Live API Traffic| Users;
+    A[DEV Environment] -->|Code Testing| B[TEST Environment];
+    B -->|Automated Tests| C[QA (Staging) Environment];
+    C -->|Approval & Deployment| D[PROD Environment];
+    D -->|Live API Traffic| Users[Users];
 ```
----
-## **:white_check_mark: Best Practices**
-- **Version Control:** Use Git for managing API changes.
-- **Automated Testing:** Ensure API behavior across all environments.
-- **Monitoring & Logging:** Use Apigee analytics for real-time insights.
-- **Security Compliance:** Apply OAuth, JWT, and other security measures before production deployment.
 
 ---
-## **:trophy: Summary**
-Apigee environments provide a structured deployment approach from development to production. Each stage ensures quality, security, and performance before APIs reach users.
 
-🚀 **"Build, Test, Stage, and Deploy with Confidence!"**
+## **:clipboard: Workflow Summary**
+1. **DEV**: APIs are developed and unit-tested.
+2. **TEST**: APIs undergo rigorous automated and manual testing.
+3. **QA (Staging)**: APIs are validated in a staging environment that mirrors production.
+4. **PROD**: APIs are deployed to production for end-users.
+
+---
+
+## **:bulb: Key Notes**
+- The **QA (Staging)** environment is critical for identifying potential issues before deployment.
+- Each environment ensures that APIs are robust, secure, and meet business requirements.
+- Proper transitions between environments ensure smooth and reliable API deployment.
+
+---
