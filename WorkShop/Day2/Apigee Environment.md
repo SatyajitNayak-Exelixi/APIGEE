@@ -41,17 +41,6 @@ DEV → TEST → QA (Staging) → PROD
 - **Example:** `https://api.example.com`
 
 ---
-## **:chart_with_upwards_trend: Diagram Representation**
-
-```mermaid
-graph TD;
-    A[DEV Environment] -->|Code Testing| B[TEST Environment];
-    B -->|Automated Tests| C[QA (Staging) Environment];
-    C -->|Approval & Deployment| D[PROD Environment];
-    D -->|Live API Traffic| Users[Users];
-```
-
----
 
 ## **:clipboard: Workflow Summary**
 1. **DEV**: APIs are developed and unit-tested.
