@@ -58,11 +58,11 @@ The **Spike Arrest Policy** prevents **sudden traffic surges** that could overlo
 ## 📌 **3. Reset Quota Policy**
 The **Reset Quota Policy** resets the usage limits dynamically, allowing flexibility for API clients.
 
+Imagine you have an API that allows users to make 1000 requests per day. However, you want to reset the quota for a specific user when they upgrade to a premium plan without waiting for the next reset cycle.
+
 ### ✅ **How It Works**
 - Resets the quota **before the standard interval**.
 - Helps in **on-demand quota refresh**.
-
--Imagine you have an API that allows users to make 1000 requests per day. However, you -want to reset the quota for a specific user when they upgrade to a premium plan -without waiting for the next reset cycle.
 
 
 ### 🔧 **Example Reset Quota Policy Configuration**
