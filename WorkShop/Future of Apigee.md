@@ -30,14 +30,14 @@ Apigee, a leading API management platform by Google Cloud, is expected to evolve
 
 Apigee competes with other API management platforms like **Kong, Mulesoft, AWS API Gateway, and Azure API Management**. Here’s how it stands out:
 
-| Feature | Apigee | AWS API Gateway | Azure API Management | Mulesoft | Kong |
-|---------|--------|----------------|----------------------|----------|------|
-| **Cloud-Native Support** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ Limited | ✅ Yes |
-| **Security & Compliance** | ✅ Advanced | ✅ Basic | ✅ Good | ✅ Good | ✅ Good |
-| **Analytics & Monitoring** | ✅ AI-driven | ❌ Basic | ✅ Integrated | ✅ Good | ✅ Limited |
-| **Hybrid & Multi-Cloud** | ✅ Yes | ❌ No | ❌ No | ✅ Yes | ✅ Yes |
-| **Developer Experience** | ✅ Intuitive | ❌ Complex | ✅ Good | ✅ Good | ✅ Good |
-| **API Monetization** | ✅ Advanced | ❌ No | ❌ No | ✅ Limited | ❌ No |
+| Feature | Apigee | AWS API Gateway | Azure API Management | Mulesoft | TIBCO | SEEBURGER |
+|---------|--------|----------------|----------------------|----------|------|----------|
+| **Cloud-Native Support** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ Limited | ❌ No | ❌ No |
+| **Security & Compliance** | ✅ Advanced | ✅ Basic | ✅ Good | ✅ Good | ✅ Good | ✅ Good |
+| **Analytics & Monitoring** | ✅ AI-driven | ❌ Basic | ✅ Integrated | ✅ Good | ✅ Limited | ✅ Limited |
+| **Hybrid & Multi-Cloud** | ✅ Yes | ❌ No | ❌ No | ✅ Yes | ❌ No | ❌ No 
+| **Developer Experience** | ✅ Intuitive | ❌ Complex | ✅ Good | ✅ Good | ✅ Good | ✅ Good |
+| **API Monetization** | ✅ Advanced | ❌ No | ❌ No | ✅ Limited | ❌ No | ❌ No |
 
 **Why Apigee?**
 - **AI-powered monitoring** and predictive analytics.
