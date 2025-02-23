@@ -56,6 +56,6 @@ The **Publish** section in Apigee helps you expose your APIs securely and effici
 ---
 
 ## 🛠️ **Need Assistance?**
-For further guidance or questions, connect with your **team coach** for support!
+For further guidance or questions, Please refer to https://docs.apigee.com/api-platform/publish/what-api-product.
 
 ---
