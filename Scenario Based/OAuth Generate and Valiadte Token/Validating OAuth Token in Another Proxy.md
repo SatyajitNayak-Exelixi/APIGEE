@@ -1,4 +1,4 @@
-# :label: Validate Apigee OAuth2 :high_brightness:
+# :label: 📝 Validating OAuth Token in Another Proxy :high_brightness:
 
 - You need to add OAuthV2 Policy into that proxy where you want to validate OAuth plus make sure the Proxy is added to that product as well.
 
@@ -16,3 +16,5 @@
     <RFCCompliantRequestResponse>true</RFCCompliantRequestResponse>
 </OAuthV2>
 ```
+
+Ensure that the proxy validating the token is added to the correct API product.
