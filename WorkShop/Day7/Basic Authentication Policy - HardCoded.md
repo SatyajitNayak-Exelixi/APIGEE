@@ -1,108 +1,99 @@
-# 🔐 Basic Authentication Policy in Apigee
+# 🔐 Apigee Basic Authentication — Full Flow Example
 
-## 🚀 Overview
-Basic Authentication in **Apigee** is used to validate API requests by encoding and decoding user credentials (username & password) into a **Base64-encoded** `Authorization` header.
+## 📘 Overview
+
+Basic Authentication allows secure API access using a Base64-encoded `username:password` combination sent in the `Authorization` header. In this guide, we’ll walk through a complete working example in Apigee:
+
+- 🔓 Decode the credentials
+- 🧠 Validate using JavaScript
+- ❌ Return 401 if invalid
+- ✅ Allow request if valid
 
 ---
 
-## 🛠 Policy Configuration
+## 🔁 PreFlow Setup
 
-### ✅ **Encoding Credentials**
-This policy encodes username and password into a **Basic Auth Header**:
+The following `PreFlow` runs the policies in order:
 
 ```xml
-<BasicAuthentication continueOnError="false" enabled="true" name="Basic-Authentication-1">
-    <DisplayName>Basic Authentication-1</DisplayName>
-    <Operation>Encode</Operation>
-    <User ref="request.queryparam.username"/>
-    <Password ref="request.queryparam.password"/>
-    <AssignTo createNew="false">request.header.Authorization</AssignTo>
-</BasicAuthentication>
+<PreFlow name="PreFlow">
+    <Request>
+        <Step>
+            <Name>DecodeBasicAuthentication</Name>
+        </Step>
+        <Step>
+            <Name>JS-ValidateCredential</Name>
+        </Step>
+        <Step>
+            <Name>RF-AuthError</Name>
+            <Condition>Authentication-Failed = "true"</Condition>
+        </Step>
+    </Request>
+    <Response/>
+</PreFlow>
 ```
 
 ---
 
-### ✅ **Decoding and Validating Credentials**
-When an API request includes the following header:
+## :gear: **Step-by-Step Guide to Creating an API Proxy**
 
-```http
-Authorization: Basic YWRtaW46c2VjdXJlMTIz
-```
-
-Apigee needs to:
-1. Extract the token.
-2. Decode it to retrieve the username and password.
-3. Validate credentials.
-4. Return a **401 Unauthorized** error if authentication fails.
+### **Step 1: BasicAuthentication Policy (Decode) : This policy decodes the Basic Auth header.**
 
 ```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <BasicAuthentication async="false" continueOnError="false" enabled="true" name="DecodeBasicAuthentication">
-    <DisplayName>Decode Basic Authentication</DisplayName>
+    <DisplayName>DecodeBasicAuthentication</DisplayName>
     <Operation>Decode</Operation>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
     <User ref="request.header.username"/>
     <Password ref="request.header.password"/>
     <Source>request.header.Authorization</Source>
 </BasicAuthentication>
 ```
 
-This policy extracts and decodes credentials from the `Authorization` header.
+### **Step 2: JavaScript Policy to Validate Credentials**
 
----
-
-### ⚡ **Handling Invalid Credentials (JavaScript Policy)**
-If the decoded credentials are incorrect, return a **401 Unauthorized error**:
-
+## Policy XML
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Javascript async="false" continueOnError="false" enabled="true" timeLimit="200" name="JS-ValidateCredential">
+    <DisplayName>JS-ValidateCredential</DisplayName>
+    <Properties/>
+    <ResourceURL>jsc://JS-ValidateCredential.js</ResourceURL>
+</Javascript>
+```
+### JavaScript File: `JS-ValidateCredential.js`
 ```javascript
+// Expected Credentials
+var expectedUsername = "Famlanding";
+var expectedPassword = "Famlanding12345";
+
+// Extract from decoded headers
 var username = context.getVariable("request.header.username");
 var password = context.getVariable("request.header.password");
 
-if (!username || !password || username !== "admin" || password !== "secure123") {
-    context.setVariable("response.status.code", 401);
-    context.setVariable("response.reason.phrase", "Unauthorized");
-    context.setVariable("response.content", JSON.stringify({ "error": "Invalid Credentials" }));
-    throw "Unauthorized";
+// Validate
+if (username !== expectedUsername || password !== expectedPassword) {
+    context.setVariable("Authentication-Failed", true);
 }
+ ```
+
+
+### **Step 3: Raise Fault for Unauthorized Access : This policy is triggered if validation fails.**
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RaiseFault async="false" continueOnError="false" enabled="true" name="RF-AuthError">
+    <DisplayName>RF-AuthError</DisplayName>
+    <Properties/>
+    <FaultResponse>
+        <Set>
+            <Headers/>
+            <Payload>{"error": "Invalid username or password."}</Payload>
+            <StatusCode>401</StatusCode>
+            <ReasonPhrase>UnAuthorized</ReasonPhrase>
+        </Set>
+    </FaultResponse>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</RaiseFault>
 ```
-
----
-
-## 🔄 **How It Works**
-
-1️⃣ **Client Request:**
-```http
-GET /api/resource HTTP/1.1
-Host: api.example.com
-Authorization: Basic YWRtaW46c2VjdXJlMTIz
-```
-
-2️⃣ **Apigee Decodes and Validates Credentials**
-
-3️⃣ **Response Based on Validation:**
-✅ **Success:** API processes the request.  
-❌ **Failure:** API returns **401 Unauthorized**:
-```json
-{
-  "error": "Invalid Credentials"
-}
-```
-
----
-
-## 🏆 Advantages of Basic Authentication
-✔ **Simple & Easy to Implement**
-✔ **Works with Any HTTP Client**
-✔ **Avoids Sending Plaintext Passwords**
-
----
-
-## ⚠ Important Considerations
-⚠ **Always Use HTTPS** – Prevents credentials from being intercepted.  
-⚠ **Not Ideal for Sensitive APIs** – Consider OAuth2 for stronger security.  
-
----
-
-## 🎯 Summary
-This policy enables **secure authentication** using `BasicAuth`, ensuring only valid users access the API. For high-security environments, use **OAuth2** instead.
-
-🚀 **Now you can confidently implement Basic Authentication in Apigee!** 🔥
-
