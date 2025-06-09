@@ -11,21 +11,36 @@ Apigee provides two key OAuth policies:
 
 ### 🔧 **Example: Generating an Access Token**
 ```xml
-<OAuthV2 name="Generate-Access-Token">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OAuthV2 async="false" continueOnError="false" enabled="true" name="OAuth-v20-GenerateToken">
+    <DisplayName>OAuth-v2.0-GenerateToken</DisplayName>
+    <Properties/>
+    <Attributes/>
+    <ExternalAuthorization>false</ExternalAuthorization>
+    <!-- This is in millseconds, so expire in a day -->
+    <ExpiresIn>86400000</ExpiresIn>
     <Operation>GenerateAccessToken</Operation>
-    <ExpiresIn>3600</ExpiresIn> <!-- Token expires in 1 hour -->
     <SupportedGrantTypes>
         <GrantType>client_credentials</GrantType>
     </SupportedGrantTypes>
-    <GrantType>request.queryparam.grant_type</GrantType>
     <GenerateResponse enabled="false"/>
+    <Tokens/>
 </OAuthV2>
 ```
 
 ### 🔧 **Example: Verifying an Access Token**
 ```xml
-<OAuthV2 name="Verify-Access-Token">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OAuthV2 continueOnError="false" enabled="true" name="OAuth-v20-1">
+    <DisplayName>OAuth v2.0-1</DisplayName>
+    <Properties/>
+    <Attributes/>
+    <ExternalAuthorization>false</ExternalAuthorization>
     <Operation>VerifyAccessToken</Operation>
+    <SupportedGrantTypes/>
+    <GenerateResponse enabled="true"/>
+    <Tokens/>
+    <RFCCompliantRequestResponse>true</RFCCompliantRequestResponse>
 </OAuthV2>
 ```
 
