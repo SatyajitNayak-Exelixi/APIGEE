@@ -22,12 +22,17 @@ The **Response Cache Policy** stores complete API responses in memory, allowing 
 
 ### 🔧 **Example Response Cache Policy**
 ```xml
-<ResponseCache name="Cache-API-Response">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ResponseCache async="false" continueOnError="false" enabled="true" name="Response-Cache-1">
+    <DisplayName>Response Cache-1</DisplayName>
+    <Properties/>
     <CacheKey>
-        <KeyFragment ref="request.uri"/>
+        <Prefix/>
+        <KeyFragment ref="request.uri" type="string"/>
     </CacheKey>
+    <Scope>Exclusive</Scope>
     <ExpirySettings>
-        <TimeoutInSeconds>300</TimeoutInSeconds> <!-- Cache for 5 minutes -->
+        <TimeoutInSec>300</TimeoutInSec>
     </ExpirySettings>
 </ResponseCache>
 ```
@@ -35,7 +40,7 @@ The **Response Cache Policy** stores complete API responses in memory, allowing 
 ### ⚡ **Use Case**
 ✔ Reduces redundant backend calls.
 ✔ Improves API response time.
-✔ Ideal for static or infrequently changing responses (e.g., **product catalogs, weather data**).
+✔ Ideal for static or infrequently changing responses (e.g., **product catalogs, Banners or Advertize **).
 
 ---
 

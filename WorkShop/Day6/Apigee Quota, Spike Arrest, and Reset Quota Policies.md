@@ -19,16 +19,20 @@ The **Quota Policy** restricts the number of API calls a client can make over a 
 
 ### 🔧 **Example Quota Policy Configuration**
 ```xml
-<Quota name="Enforce-Quota">
-    <Allow count="1000"/>  <!-- Maximum 1000 requests allowed -->
-    <Interval>1</Interval>   <!-- Time Interval -->
-    <TimeUnit>day</TimeUnit> <!-- Interval Unit (minute/hour/day) -->
-    <Identifier ref="request.header.api-key"/>  <!-- Quota per API key -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Quota async="false" continueOnError="false" enabled="true" name="Quota" type="flexi">
+    <DisplayName>Quota</DisplayName>
+    <Properties/>
+    <Allow count="5" countRef="AppCustomVar.ThrottleCount"/>
+    <Interval ref="AppCustomVar.Interval">1</Interval>
+    <TimeUnit ref="AppCustomVar.TimeUnit">minute</TimeUnit>
+    <Distributed>true</Distributed>
+    <Synchronous>true</Synchronous>
 </Quota>
 ```
 
 ### ⚡ **Use Case**
-✔ Limit free-tier users to **1000 requests per day**.
+✔ Limit free-tier users to **5 requests per minute**.
 ✔ Prevent API overuse and **ensure fair distribution**.
 
 ---
@@ -44,7 +48,7 @@ The **Spike Arrest Policy** prevents **sudden traffic surges** that could overlo
 ### 🔧 **Example Spike Arrest Policy Configuration**
 ```xml
 <SpikeArrest name="Prevent-Spike">
-    <Rate>10pm</Rate> <!-- Allows 10 requests per minute -->
+    <Rate>10ps</Rate> <!-- Allows 10 requests per second -->
 </SpikeArrest>
 ```
 
@@ -67,10 +71,16 @@ Imagine you have an API that allows users to make 1000 requests per day. However
 
 ### 🔧 **Example Reset Quota Policy Configuration**
 ```xml
-<Quota name="Reset-User-Quota">
-    <Distributed>true</Distributed>
-    <UseEffectiveCount>true</UseEffectiveCount>
-</Quota>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ResetQuota async="false" continueOnError="false" enabled="true" name="Reset-Quota-1">
+    <DisplayName>Reset Quota-1</DisplayName>
+    <Properties/>
+    <Quota name="quotaName">
+        <Identifier name="identifierName" ref="request.header.identifier">
+            <Allow>100</Allow>
+        </Identifier>
+    </Quota>
+</ResetQuota>
 ```
 
 ### ⚡ **Use Case**
