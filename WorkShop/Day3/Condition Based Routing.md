@@ -57,6 +57,10 @@ These conditions decide **which target endpoint** the request should hit.
     <TargetEndpoint>Amazon</TargetEndpoint>
     <Condition>request.queryparam.SiteID = "Amazon"</Condition>
 </RouteRule>
+```
+---
+
+## 🔧 Assign Message : To block the additional Params
 
 ```xml
 <!-- 🔹 Add this Assign message in the Pre flow of the targer to remove the addition Params befor hitting the Target URL  -->
@@ -73,3 +77,4 @@ These conditions decide **which target endpoint** the request should hit.
     <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
     <AssignTo createNew="false" transport="http" type="request"/>
 </AssignMessage>
+```
