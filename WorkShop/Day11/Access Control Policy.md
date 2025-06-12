@@ -22,18 +22,32 @@ The **AccessControl** policy in Apigee allows or blocks API requests based on IP
 A company wants to allow only certain IP addresses to access their internal APIs while blocking unauthorized access.
 
 ### **Allowed Request:**
-```http
-GET /secure-data HTTP/1.1
-Host: api.example.com
-Origin-IP: 192.168.1.1
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AccessControl async="false" continueOnError="false" enabled="true" name="Access-Control-1">
+    <DisplayName>Access Control-1</DisplayName>
+    <Properties/>
+    <IPRules noRuleMatchAction="DENY">
+        <MatchRule action="ALLOW">
+            <SourceAddress mask="32">106.213.87.148</SourceAddress>
+        </MatchRule>
+    </IPRules>
+</AccessControl>
 ```
 ✅ **Access Granted**
 
 ### **Blocked Request:**
-```http
-GET /secure-data HTTP/1.1
-Host: api.example.com
-Origin-IP: 10.0.0.1
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AccessControl async="false" continueOnError="false" enabled="true" name="Access-Control-1">
+    <DisplayName>Access Control-1</DisplayName>
+    <Properties/>
+    <IPRules noRuleMatchAction="ALLOW">
+        <MatchRule action="DENY">
+            <SourceAddress mask="32">106.213.87.148</SourceAddress>
+        </MatchRule>
+    </IPRules>
+</AccessControl>
 ```
 ❌ **Access Denied: Unauthorized IP**
 
