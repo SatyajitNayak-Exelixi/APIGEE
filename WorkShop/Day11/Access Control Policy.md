@@ -6,14 +6,15 @@ The **AccessControl** policy in Apigee allows or blocks API requests based on IP
 ## ✅ Apigee Access Control Policy Example
 
 ```xml
-<AccessControl name="Restrict-Access">
-    <Allow>
-        <IP>192.168.1.1</IP>
-        <IP>192.168.1.2</IP>
-    </Allow>
-    <Deny>
-        <IP>10.0.0.1</IP>
-    </Deny>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AccessControl async="false" continueOnError="false" enabled="true" name="Access-Control-1">
+    <DisplayName>Access Control-1</DisplayName>
+    <Properties/>
+    <IPRules noRuleMatchAction="DENY">
+        <MatchRule action="ALLOW">
+            <SourceAddress mask="32">106.213.87.148</SourceAddress>
+        </MatchRule>
+    </IPRules>
 </AccessControl>
 ```
 
