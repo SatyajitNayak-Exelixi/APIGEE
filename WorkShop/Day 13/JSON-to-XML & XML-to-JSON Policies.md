@@ -23,73 +23,63 @@ Imagine you are developing an API that connects a **modern mobile application** 
 
 ## 🔑 **How These Policies Work in Apigee**
 
-### **1️⃣ JSON-to-XML Policy**
-- Converts incoming JSON payloads into XML format.
-- Useful when integrating with SOAP or legacy systems that require XML.
+### **1️⃣  JSON-to-XML Policy** TO CONVERT A JSON PAYLOAD TO XML.
+- Converts incoming JSON response payloads into XML format.
 
-### **2️⃣ XML-to-JSON Policy**
-- Converts XML responses into JSON format.
-- Helps modern applications interact with legacy APIs seamlessly.
-
----
-
-## 💡 **Example of JSON-to-XML Policy in Apigee**
-
-### **Incoming JSON Request:**
-```json
-{
-  "customer": {
-    "name": "John Doe",
-    "email": "john.doe@example.com"
-  }
-}
-```
-
-### **Apigee JSON-to-XML Policy:**
 ```xml
-<JSONToXML name="Convert-JSON-To-XML">
-    <OutputVariable>request</OutputVariable>
-    <Format>compact</Format>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<JSONToXML name="JSON-To-XML-Convert">
+    <DisplayName>Convert JSON to XML</DisplayName>
+    <Source>response</Source> <!-- or "request" depending on where your JSON is -->
+    <OutputVariable>convertedXml</OutputVariable>
+    <Format>yahoo</Format> <!-- "yahoo" gives a simpler XML, "standard" is more verbose -->
 </JSONToXML>
 ```
 
-### **Converted XML Output:**
 ```xml
-<customer>
-    <name>John Doe</name>
-    <email>john.doe@example.com</email>
-</customer>
+<AssignMessage name="ReturnConvertedXML">
+    <DisplayName>Return XML</DisplayName>
+    <AssignTo createNew="false" transport="http">response</AssignTo>
+    <Set>
+        <Payload contentType="application/xml">{convertedXml}</Payload>
+    </Set>
+</AssignMessage>
 ```
-
 ---
 
-## 💡 **Example of XML-to-JSON Policy in Apigee**
+### **2️⃣ XML-to-JSON Policy** TO CONVERT A XML RESPONSE PAYLOAD TO JSON.
 
-### **Incoming XML Response:**
-```xml
-<customer>
-    <name>John Doe</name>
-    <email>john.doe@example.com</email>
-</customer>
-```
+- Converts incoming XML response payloads into JSON format.
 
-### **Apigee XML-to-JSON Policy:**
 ```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <XMLToJSON name="Convert-XML-To-JSON">
-    <OutputVariable>response</OutputVariable>
+    <DisplayName>Convert XML To JSON</DisplayName>
+    <Source>response</Source>
+    <!-- Or 'request' if you're converting request body -->
+    <OutputVariable>convertedJson</OutputVariable>
+    <Options>
+        <ObjectRootElementName>root</ObjectRootElementName>
+        <SuppressJsonNull>false</SuppressJsonNull>
+    </Options>
 </XMLToJSON>
 ```
 
-### **Converted JSON Output:**
-```json
-{
-  "customer": {
-    "name": "John Doe",
-    "email": "john.doe@example.com"
-  }
-}
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="Return-JSON">
+    <AssignVariable>
+        <Name>response.content</Name>
+        <Ref>convertedJson</Ref>
+    </AssignVariable>
+    <AssignVariable>
+        <Name>response.header.Content-Type</Name>
+        <Value>application/json</Value>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>
 ```
-
 ---
 
 ## 🚀 **Benefits of JSON-to-XML & XML-to-JSON Policies in Apigee**
