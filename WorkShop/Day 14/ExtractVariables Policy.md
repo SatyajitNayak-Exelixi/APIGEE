@@ -1,104 +1,79 @@
 # 🔍 ExtractVariables Policy in Apigee
 
 ## 📌 **Introduction**
-The **ExtractVariables Policy** in Apigee is used to **extract specific values from request or response messages** and store them in variables. This policy is useful when you need to **parse JSON, XML, query parameters, headers, or even regular expressions** from an API request/response.
+The **ExtractVariables Policy** in Apigee is used to **extract specific values** from request or response messages and store them in variables. These values can be extracted from:
+
+- JSON or XML payloads
+- Query parameters
+- Headers
+- Regular expressions
+
+This policy helps dynamically route traffic, validate data, or manipulate flow logic without custom code.
 
 ---
 
-## 🎯 **Real-Time Scenario**
-### **Scenario:**
-A client sends an API request containing a **JWT token** in the Authorization header, and your API needs to extract the **user ID** from the token.
+## 🎯 Real-Time Scenario – Candidate Routing Based on Profile Type
 
-### **Problem:**
-- The backend service expects a **user ID** but receives a **JWT token** instead.
-- You need to extract and pass the **user ID** dynamically.
+### 🔹 Use Case:
 
-### **Solution:**
-- Use **ExtractVariables Policy** to parse the JWT token and extract the **user ID**.
+You receive a JSON request with candidate details. You want to **route the request to different backend targets** based on the `profileType` field.
+
+- If `"profileType": "internal"` → Route to `https://662e3897a7dda1fa378c64d4.mockapi.io/api/v1/vendorcodes/LearningApigee`
+- If `"profileType": "external"` → Route to `https://662e3897a7dda1fa378c64d4.mockapi.io/api/v1/vendorcodes/vendorcodes`
 
 ---
 
-## 🔄 **How ExtractVariables Policy Works in Apigee**
-1. **Extracts data from JSON, XML, headers, query parameters, or regular expressions.**
-2. **Stores extracted values in variables** for further processing.
-3. **Enhances API performance** by reducing the need for additional backend calls.
+## 📤 Sample cURL Request with Payload
 
+```bash
+curl --location 'https://api-te.ingrammicro.com:443/famlanding/LearningApigee' \
+--header 'SenderID: FAMLAnding' \
+--header 'Authorization: Basic RmFtbGFuZGluZzpGYW1sYW5kaW5nMTIzNA==' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "candidateId": "CAND12345",
+  "fullName": "Jack Sparrow",
+  "email": "jack.sparrow@example.com",
+  "experienceYears": 5,
+  "skills": ["Apigee", "DevOps", "JavaScript", "React"],
+  "location": "Bangalore",
+  "profileType": "external",
+  "status": "active"
+}'
+``` 
 ---
 
-## 💡 **Examples of ExtractVariables Policy in Apigee**
-
-### **1️⃣ Extract from JSON Response**
-Extracts values from a **JSON response body**.
+### **1️⃣ Extract profileType Using ExtractVariables Policy**
+Extracts values from a **JSON request body**.
 
 ```xml
-<ExtractVariables name="ExtractFromJSON">
-    <Source>response</Source>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtractVariables name="EV-Extract-ProfileType">
     <JSONPayload>
-        <Variable name="userId" type="string">
-            <JSONPath>$.data.user.id</JSONPath>
+        <Variable name="profileType">
+            <JSONPath>$.profileType</JSONPath>
         </Variable>
     </JSONPayload>
-</ExtractVariables>
-```
-📌 **Use Case:** Extracts `userId` from the JSON response `{"data": {"user": {"id": "12345"}}}` and stores it in a variable.
-
----
-
-### **2️⃣ Extract from XML Response**
-Extracts values from an **XML response body**.
-
-```xml
-<ExtractVariables name="ExtractFromXML">
-    <Source>response</Source>
-    <XMLPayload>
-        <Variable name="orderId" type="string" xpath="//Order/ID"/>
-    </XMLPayload>
-</ExtractVariables>
-```
-📌 **Use Case:** Extracts `orderId` from the XML `<Order><ID>98765</ID></Order>`.
-
----
-
-### **3️⃣ Extract from Query Parameters**
-Extracts query parameters from the request URL.
-
-```xml
-<ExtractVariables name="ExtractFromQueryParam">
     <Source>request</Source>
-    <QueryParam name="transactionId"/>
 </ExtractVariables>
 ```
-📌 **Use Case:** Extracts `transactionId` from `https://api.example.com/orders?transactionId=abc123`.
-
 ---
 
-### **4️⃣ Extract from Headers**
-Extracts data from request headers.
+### **2️⃣ Routing Logic in ProxyEndpoint**
+Route the Traffice to the specif target depends on the matching condition..
 
 ```xml
-<ExtractVariables name="ExtractFromHeader">
-    <Source>request</Source>
-    <Header name="Authorization" variable="authHeader"/>
-</ExtractVariables>
+<RouteRule name="LearningApigee">
+        <TargetEndpoint>LearningApigee</TargetEndpoint>
+        <Condition>profileType = "external"</Condition>
+    </RouteRule>
+    <RouteRule name="LearningApigee-EXT">
+        <TargetEndpoint>LearningApigee-EXT</TargetEndpoint>
+        <Condition>profileType = "internal"</Condition>
+    </RouteRule>
 ```
-📌 **Use Case:** Extracts the `Authorization` header value (e.g., `Bearer token123`).
-
 ---
 
-### **5️⃣ Extract Using Regular Expressions**
-Extracts specific patterns from a string.
-
-```xml
-<ExtractVariables name="ExtractUsingRegex">
-    <Source>request</Source>
-    <Variable name="clientId">
-        <Pattern>client_id=([^&]+)</Pattern>
-    </Variable>
-</ExtractVariables>
-```
-📌 **Use Case:** Extracts `clientId` from `client_id=XYZ123&scope=read` using regex.
-
----
 
 ## 🚀 **Benefits of ExtractVariables Policy in Apigee**
 ✅ **Automates data extraction** – No need for additional backend processing.

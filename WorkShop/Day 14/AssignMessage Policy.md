@@ -71,7 +71,7 @@ Add a new header and query parameter to the request.
 <AssignMessage name="AddNewHeaderAndQueryParam">
     <Add>
         <Headers>
-            <Header name="X-Transaction-ID">12345</Header>
+            <Header name="Sender-ID">FamLanding</Header>
         </Headers>
         <QueryParams>
             <QueryParam name="source">mobile</QueryParam>
@@ -80,6 +80,19 @@ Add a new header and query parameter to the request.
     <AssignTo createNew="false" type="request"/>
 </AssignMessage>
 ```
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="AM-Add-SenderID-Response">
+    <Add>
+        <Headers>
+            <Header name="Sender-ID">FamLanding</Header>
+        </Headers>
+    </Add>
+    <AssignTo createNew="false" type="response"/>
+</AssignMessage>
+```
+
 📌 **Use Case:** Adds a transaction ID header and a `source=mobile` query parameter.
 
 ---
