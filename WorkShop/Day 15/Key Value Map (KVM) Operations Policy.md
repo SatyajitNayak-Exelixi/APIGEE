@@ -21,7 +21,7 @@ When a request comes in, fetch the **username and password** from a KVM and send
 ### 🔐 Policy 1: Get Username/Password from KVM
 
 ```xml
-<KeyValueMapOperations name="KVM-Operations" mapIdentifier="OSTShipmentRegister" continueOnError="false" enabled="true">
+<KeyValueMapOperations name="KVM-Operations" mapIdentifier="FAMLanding" continueOnError="false" enabled="true">
     <DisplayName>KVM-Operations</DisplayName>
     <ExclusiveCache>false</ExclusiveCache>
     <ExpiryTimeInSecs>30000</ExpiryTimeInSecs>
@@ -58,21 +58,23 @@ You store **country codes and their corresponding regions** in a KVM (e.g. `AU �
 
 ### 🧩 KVM Name:
 
-`SimplifiedAPI-GCPCountryList`
+`FAMLanding`
 
 ### 🔐 Policy 1: Get Region from KVM
-
-![SimplifiedAPI-GCPCountryList Example](./images/SimplifiedAPI-GCPCountryList.png)
 
 📷 *Example KVM mapping country codes to regions used in routing logic.*
 
 ```xml
-<KeyValueMapOperations name="Get-Region" mapIdentifier="SimplifiedAPI-GCPCountryList" continueOnError="false" enabled="true">
-    <DisplayName>Get-Region</DisplayName>
+<<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<KeyValueMapOperations async="false" continueOnError="false" enabled="true" name="CountryListRegionwise" mapIdentifier="FAMLanding">
+    <DisplayName>CountryListRegionwise</DisplayName>
+    <Properties/>
     <ExclusiveCache>false</ExclusiveCache>
-    <ExpiryTimeInSecs>600</ExpiryTimeInSecs>
-    <Get assignTo="region">
-        <Key><Parameter>request.queryparam.countryCode</Parameter></Key>
+    <ExpiryTimeInSecs>300</ExpiryTimeInSecs>
+    <Get assignTo="region" index="1">
+        <Key>
+            <Parameter ref="CountryCode"/>
+        </Key>
     </Get>
     <Scope>environment</Scope>
 </KeyValueMapOperations>
@@ -85,19 +87,19 @@ You store **country codes and their corresponding regions** in a KVM (e.g. `AU �
 ### 🚦 Policy 2: Route Based on Region
 
 ```xml
-<RouteRule name="OrderAsync-v7-AMER">
+<RouteRule name="AMER">
     <Condition>(request.verb = "POST") and (region = "AMER")</Condition>
-    <TargetEndpoint>OrderAsync-v7-AMER</TargetEndpoint>
+    <TargetEndpoint>AMER</TargetEndpoint>
 </RouteRule>
 
-<RouteRule name="OrderAsync-v7-EMEA">
+<RouteRule name="EMEA">
     <Condition>(request.verb = "POST") and (region = "EMEA")</Condition>
-    <TargetEndpoint>OrderAsync-v7-EMEA</TargetEndpoint>
+    <TargetEndpoint>EMEA</TargetEndpoint>
 </RouteRule>
 
-<RouteRule name="OrderAsync-v7-APAC">
+<RouteRule name="APAC">
     <Condition>(request.verb = "POST") and (region = "APAC")</Condition>
-    <TargetEndpoint>OrderAsync-v7-APAC</TargetEndpoint>
+    <TargetEndpoint>APAC</TargetEndpoint>
 </RouteRule>
 ```
 
@@ -121,7 +123,7 @@ Below are the key-value pairs defined in the `SimplifiedAPI-GCPCountryList` KVM 
 | MX           | AMER   |
 | NZ           | APAC   |
 | UK           | EMEA   |
-| UK,uk        | EMEA   |
+| UK           | EMEA   |
 | US           | AMER   |
 
 📌 *These mappings are used in the `Get-Region` policy to determine the correct backend target based on the country code in the incoming request.*
