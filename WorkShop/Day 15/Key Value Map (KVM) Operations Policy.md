@@ -1,20 +1,5 @@
 # 🔐 Apigee KVM Usage – Real Scenarios
 
-## 📚 Table of Contents
-
-* [What is KVM?](#what-is-kvm)
-* [Scenario 1: Fetch Credentials from KVM](#scenario-1-fetch-credentials-from-kvm)
-
-  * [Policy 1: Get Username/Password from KVM](#policy-1-get-usernamepassword-from-kvm)
-  * [Policy 2: Encode Basic Auth Header](#policy-2-encode-basic-auth-header)
-* [Scenario 2: Route Based on Country-Region Mapping](#scenario-2-route-based-on-country-region-mapping)
-
-  * [Policy 1: Get Region from KVM](#policy-1-get-region-from-kvm)
-  * [Policy 2: Route Based on Region](#policy-2-route-based-on-region)
-* [Summary](#summary)
-
----
-
 ## 🔎 What is KVM?
 
 **Key Value Map (KVM)** is a secure, encrypted key-value store in Apigee used to manage and retrieve configuration data like credentials, tokens, region codes, and other metadata across API proxies.
@@ -120,14 +105,23 @@ You store **country codes and their corresponding regions** in a KVM (e.g. `AU �
 
 ---
 
-## 🧾 Screenshot Reference
+## 🧾 Country Code to Region Mapping (KVM Content)
 
-Below is the detailed screenshot of the country-to-region mapping used in the KVM `SimplifiedAPI-GCPCountryList`.
+Below are the key-value pairs defined in the `SimplifiedAPI-GCPCountryList` KVM used for routing:
 
-![SimplifiedAPI-GCPCountryList Full Mapping](./images/SimplifiedAPI-GCPCountryList-Full.png)
+| Country Code | Region |
+| ------------ | ------ |
+| AU           | APAC   |
+| CA           | AMER   |
+| DE           | EMEA   |
+| ES           | EMEA   |
+| FR           | EMEA   |
+| IN           | APAC   |
+| IT           | EMEA   |
+| MX           | AMER   |
+| NZ           | APAC   |
+| UK           | EMEA   |
+| UK,uk        | EMEA   |
+| US           | AMER   |
 
-📷 *Screenshot showing key-value mappings for region-based routing logic in Apigee.*
-
-* Always use `Scope = environment` for shared access across proxies.
-* Use `AssignTo` to control variable names when retrieving KVM values.
-* Use meaningful variable names for easier routing and debugging.
+📌 *These mappings are used in the `Get-Region` policy to determine the correct backend target based on the country code in the incoming request.*
