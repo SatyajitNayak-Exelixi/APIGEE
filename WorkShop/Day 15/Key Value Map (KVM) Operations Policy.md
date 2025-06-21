@@ -1,88 +1,133 @@
-# 🔑 Key Value Map (KVM) Operations Policy in Apigee
+# 🔐 Apigee KVM Usage – Real Scenarios
 
-## 📌 **Introduction**
-Key Value Map (KVM) in **Apigee** is a secure way to **store and retrieve key-value pairs** that can be used across API proxies. It helps in managing sensitive information, such as **API keys, secrets, or configurations**, without hardcoding them in the policies.
+## 📚 Table of Contents
 
----
+* [What is KVM?](#what-is-kvm)
+* [Scenario 1: Fetch Credentials from KVM](#scenario-1-fetch-credentials-from-kvm)
 
-## 🎯 **Real-Time Scenario**
-### **Scenario:**
-You have an API that needs to fetch **client-specific configuration** values (such as rate limits or feature flags) based on the request.
+  * [Policy 1: Get Username/Password from KVM](#policy-1-get-usernamepassword-from-kvm)
+  * [Policy 2: Encode Basic Auth Header](#policy-2-encode-basic-auth-header)
+* [Scenario 2: Route Based on Country-Region Mapping](#scenario-2-route-based-on-country-region-mapping)
 
-### **Problem:**
-- Hardcoding values in policies makes maintenance difficult.
-- Sensitive data like API keys should not be exposed in code.
-
-### **Solution:**
-- Store configurations securely in **KVM** and retrieve them dynamically during API execution using the **KeyValueMapOperations policy**.
+  * [Policy 1: Get Region from KVM](#policy-1-get-region-from-kvm)
+  * [Policy 2: Route Based on Region](#policy-2-route-based-on-region)
+* [Summary](#summary)
 
 ---
 
-## 🔄 **How Key Value Map Operations Work in Apigee**
+## 🔎 What is KVM?
 
-1. **Storing Data** – Add key-value pairs to a named KVM.
-2. **Retrieving Data** – Fetch values dynamically during API execution.
-3. **Deleting Data** – Remove keys when they are no longer needed.
+**Key Value Map (KVM)** is a secure, encrypted key-value store in Apigee used to manage and retrieve configuration data like credentials, tokens, region codes, and other metadata across API proxies.
+
+➡️ **Use Case (One-liner):** Store and retrieve reusable data (e.g., credentials or routing info) securely without hardcoding in your API policies.
 
 ---
 
-## 💡 **Examples of Key Value Map Operations in Apigee**
+## ✅ Scenario 1: Fetch Credentials from KVM
 
-### **1️⃣ Create and Store Key-Value Pairs**
-Use this policy to **store values** in KVM.
+### 📘 Use Case:
+
+When a request comes in, fetch the **username and password** from a KVM and send them to the backend using **Basic Authentication**.
+
+### 🧩 KVM Name:
+
+`OSTShipmentRegister`
+
+### 🔐 Policy 1: Get Username/Password from KVM
 
 ```xml
-<KeyValueMapOperations name="KVM-Store">
-    <Scope>environment</Scope>
-    <Put>
-        <Key>client-rate-limit</Key>
-        <Value>100</Value>
-    </Put>
-</KeyValueMapOperations>
-```
-📌 **Use Case:** Stores the value `100` for the key `client-rate-limit`.
-
----
-
-### **2️⃣ Retrieve Value from KVM**
-Use this policy to **retrieve values** at runtime.
-
-```xml
-<KeyValueMapOperations name="KVM-Retrieve">
-    <Scope>environment</Scope>
-    <Get assignTo="clientRateLimit">
-        <Key>client-rate-limit</Key>
+<KeyValueMapOperations name="KVM-Operations" mapIdentifier="OSTShipmentRegister" continueOnError="false" enabled="true">
+    <DisplayName>KVM-Operations</DisplayName>
+    <ExclusiveCache>false</ExclusiveCache>
+    <ExpiryTimeInSecs>30000</ExpiryTimeInSecs>
+    <Get assignTo="private.username">
+        <Key><Parameter>username</Parameter></Key>
     </Get>
+    <Get assignTo="private.password">
+        <Key><Parameter>password</Parameter></Key>
+    </Get>
+    <Scope>environment</Scope>
 </KeyValueMapOperations>
 ```
-📌 **Use Case:** Fetches `client-rate-limit` and assigns it to a variable `clientRateLimit`.
 
----
-
-### **3️⃣ Remove a Key from KVM**
-Use this policy to **delete stored values**.
+### 🔐 Policy 2: Encode Basic Auth Header
 
 ```xml
-<KeyValueMapOperations name="KVM-Delete">
+<BasicAuthentication name="Encode-BA" continueOnError="false" enabled="true">
+    <DisplayName>Encode-BA</DisplayName>
+    <Operation>Encode</Operation>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <User ref="private.username"/>
+    <Password ref="private.password"/>
+    <AssignTo createNew="true">request.header.Authorization</AssignTo>
+</BasicAuthentication>
+```
+
+---
+
+## ✅ Scenario 2: Route Based on Country-Region Mapping
+
+### 📘 Use Case:
+
+You store **country codes and their corresponding regions** in a KVM (e.g. `AU → APAC`, `US → AMER`) and route requests based on the region.
+
+### 🧩 KVM Name:
+
+`SimplifiedAPI-GCPCountryList`
+
+### 🔐 Policy 1: Get Region from KVM
+
+![SimplifiedAPI-GCPCountryList Example](./images/SimplifiedAPI-GCPCountryList.png)
+
+📷 *Example KVM mapping country codes to regions used in routing logic.*
+
+```xml
+<KeyValueMapOperations name="Get-Region" mapIdentifier="SimplifiedAPI-GCPCountryList" continueOnError="false" enabled="true">
+    <DisplayName>Get-Region</DisplayName>
+    <ExclusiveCache>false</ExclusiveCache>
+    <ExpiryTimeInSecs>600</ExpiryTimeInSecs>
+    <Get assignTo="region">
+        <Key><Parameter>request.queryparam.countryCode</Parameter></Key>
+    </Get>
     <Scope>environment</Scope>
-    <Remove>
-        <Key>client-rate-limit</Key>
-    </Remove>
 </KeyValueMapOperations>
 ```
-📌 **Use Case:** Deletes the key `client-rate-limit` from KVM.
+
+📝 This policy looks up the region for the country code received in the query param `countryCode` and assigns it directly to the variable `region`.
 
 ---
 
-## 🚀 **Benefits of KVM in Apigee**
-✅ **Security** – Store sensitive data like API keys securely.
-✅ **Flexibility** – Manage configurations without redeploying proxies.
-✅ **Scalability** – Store and retrieve values dynamically across multiple APIs.
+### 🚦 Policy 2: Route Based on Region
+
+```xml
+<RouteRule name="OrderAsync-v7-AMER">
+    <Condition>(request.verb = "POST") and (region = "AMER")</Condition>
+    <TargetEndpoint>OrderAsync-v7-AMER</TargetEndpoint>
+</RouteRule>
+
+<RouteRule name="OrderAsync-v7-EMEA">
+    <Condition>(request.verb = "POST") and (region = "EMEA")</Condition>
+    <TargetEndpoint>OrderAsync-v7-EMEA</TargetEndpoint>
+</RouteRule>
+
+<RouteRule name="OrderAsync-v7-APAC">
+    <Condition>(request.verb = "POST") and (region = "APAC")</Condition>
+    <TargetEndpoint>OrderAsync-v7-APAC</TargetEndpoint>
+</RouteRule>
+```
+
+📝 The value of the `region` variable determines which backend the request is routed to.
 
 ---
 
-## **Conclusion**
-The **Key Value Map (KVM) Operations Policy** in Apigee is a powerful feature for securely storing and retrieving configuration data. Implementing KVM ensures that your API proxies remain **flexible, secure, and easy to manage**.
+## 🧾 Screenshot Reference
 
-🚀 **Use KVM to enhance API security and configuration management in Apigee today!**
+Below is the detailed screenshot of the country-to-region mapping used in the KVM `SimplifiedAPI-GCPCountryList`.
 
+![SimplifiedAPI-GCPCountryList Full Mapping](./images/SimplifiedAPI-GCPCountryList-Full.png)
+
+📷 *Screenshot showing key-value mappings for region-based routing logic in Apigee.*
+
+* Always use `Scope = environment` for shared access across proxies.
+* Use `AssignTo` to control variable names when retrieving KVM values.
+* Use meaningful variable names for easier routing and debugging.
