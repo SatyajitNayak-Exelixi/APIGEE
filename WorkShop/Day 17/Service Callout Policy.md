@@ -5,78 +5,165 @@ The **Service Callout** policy in Apigee allows an API proxy to call an external
 
 ---
 
-## 🔥 Real-Time Scenario: Generating a Token Before Hitting Backend
-### 🎯 Use Case:
-Before forwarding the request to the backend, the API must first obtain an authentication token from an authorization server and pass it in the request header.
+## 🔥 Real-Time Scenario: Token Generation with KVM-Stored Credentials
 
-### 🛠 Steps:
-1. **Client makes a request** to Apigee.
-2. **Apigee calls an authorization server** to get a token using the Service Callout policy.
-3. **Token is extracted and added** to the request headers.
-4. **Request is forwarded** to the backend with the token.
+### 🎯 Objective:
+
+Before the client request is routed to the backend, the Apigee proxy must:
+
+1. Retrieve `client_id` and `client_secret` securely from a KVM.
+2. Make a token request to the authorization server.
+3. Extract the `access_token` from the response.
+4. Add the token to the request headers.
+5. Forward the updated request to the backend.
 
 ---
 
-## 🏗 Implementation in Apigee
+## 🛠️ Step-by-Step Implementation with Policies
 
-### 1️⃣ Define the Service Callout Policy (`GenerateToken`)
+### ✅ Step 1: Retrieve Credentials from KVM
+
+**Purpose:** Securely fetch `client_id` and `client_secret` from environment-scoped KVM.
+
+**Policy Type:** `KeyValueMapOperations`
+
 ```xml
-<ServiceCallout name="GenerateToken">
-    <Request variable="tokenResponse">
+<KeyValueMapOperations name="KVM-Operations" mapIdentifier="On-prem-OAuth">
+    <DisplayName>KVM-On-prem-OAuth</DisplayName>
+    <ExpiryTimeInSecs>30000</ExpiryTimeInSecs>
+    <Get assignTo="private.username">
+        <Key>
+            <Parameter>username</Parameter>
+        </Key>
+    </Get>
+    <Get assignTo="private.password">
+        <Key>
+            <Parameter>password</Parameter>
+        </Key>
+    </Get>
+    <Scope>environment</Scope>
+</KeyValueMapOperations>
+```
+
+---
+
+### ✅ Step 2: Call Token Endpoint
+
+**Purpose:** Make a `GET` request to the token endpoint using credentials as query parameters.
+
+**Policy Type:** `ServiceCallout`
+
+```xml
+<ServiceCallout name="On-prem-GetToken">
+    <DisplayName>On-prem-GetToken</DisplayName>
+    <Request clearPayload="false">
         <Set>
-            <Verb>POST</Verb>
-            <Path>/oauth/token</Path>
+            <Verb>GET</Verb>
             <Headers>
                 <Header name="Content-Type">application/x-www-form-urlencoded</Header>
             </Headers>
-            <FormParams>
-                <FormParam name="grant_type">client_credentials</FormParam>
-                <FormParam name="client_id">your-client-id</FormParam>
-                <FormParam name="client_secret">your-client-secret</FormParam>
-            </FormParams>
+            <QueryParams>
+                <QueryParam name="client_id">{private.username}</QueryParam>
+                <QueryParam name="client_secret">{private.password}</QueryParam>
+                <QueryParam name="grant_type">client_credentials</QueryParam>
+            </QueryParams>
         </Set>
-        <HTTPTargetConnection>
-            <URL>https://auth-server.com</URL>
-        </HTTPTargetConnection>
     </Request>
+    <Response>calloutResponse</Response>
+    <HTTPTargetConnection>
+        <URL>https://api-qa.exelixi.com/oauth/oauth20/token</URL>
+    </HTTPTargetConnection>
 </ServiceCallout>
 ```
 
-### 2️⃣ Extract the Token from Response
+---
+
+### ✅ Step 3: Extract Token from JSON Response
+
+**Purpose:** Extract the `access_token` from the JSON payload using JSONPath.
+
+**Policy Type:** `ExtractVariables`
+
 ```xml
-<ExtractVariables name="ExtractToken">
-    <Source>tokenResponse</Source>
-    <Variable name="access_token">
-        <JSONPath>$.access_token</JSONPath>
-    </Variable>
+<ExtractVariables name="Extract-token">
+    <Source>calloutResponse</Source>
+    <JSONPayload>
+        <Variable name="access_token">
+            <JSONPath>$.access_token</JSONPath>
+        </Variable>
+    </JSONPayload>
 </ExtractVariables>
 ```
 
-### 3️⃣ Add the Token to Backend Request
+---
+
+### ✅ Step 4: Assign Token to Request Header
+
+**Purpose:** Add the `access_token` to the Authorization header and forward the request.
+
+**Policy Type:** `AssignMessage`
+
 ```xml
-<AssignMessage name="SetAuthHeader">
-    <AssignTo createNew="false" type="request">request</AssignTo>
+<AssignMessage name="Assign-Authentication">
+    <DisplayName>Assign-Authentication</DisplayName>
     <Set>
         <Headers>
             <Header name="Authorization">Bearer {access_token}</Header>
+            <Header name="Content-Type">application/json</Header>
+            <Header name="Accept">application/json</Header>
         </Headers>
+        <Payload contentType="application/json">{request.content}</Payload>
     </Set>
+    <AssignVariable>
+        <Name>request.verb</Name>
+        <Value>POST</Value>
+    </AssignVariable>
+    <AssignTo createNew="true" transport="http" type="request"/>
 </AssignMessage>
 ```
 
 ---
 
-## 🎯 Final Flow
-```plaintext
-[Client] ---> [Apigee Proxy] ---> [Service Callout (Auth Server)] ---> [Backend Server]
-```
+## 📊 Key Advantages
 
-- **Security Improved** ✅ (Token-based authentication)
-- **Dynamic Token Fetching** 🔄 (No hardcoded credentials)
-- **Seamless API Integration** 🔗 (Works with any authentication server)
+* ✅ **Secure Credential Handling:** No hardcoded secrets; KVM is used.
+* ♻️ **Reusable Components:** Easily maintainable and reusable flow across proxies.
+* ⚖️ **Compliance-Friendly:** Centralized token management and auditing.
+* ✨ **Better Abstraction:** Business logic is separated from credential handling.
 
 ---
 
-## 📢 Conclusion
-The **Service Callout** policy is a powerful feature in Apigee that helps fetch external data before processing a request. In this scenario, it ensures that requests are authorized before reaching the backend, enhancing security and compliance. 🚀
+**Policy Type:** `Use this Service CallOut Policy when the credential is send in the body`
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceCallout async="false" continueOnError="false" enabled="true" name="SC-LoginAndGetJWTToken">
+    <DisplayName>SC-GenerateToken</DisplayName>
+    <Properties/>
+    <Request variable="myRequest" clearPayload="true">
+        <Set>
+            <Verb>POST</Verb>
+            <Path>/Decisions/Primary/REST/AccountService/LoginAndGetJWTToken</Path>
+            <Headers>
+                <Header name="Content-Type">application/json</Header>
+            </Headers>
+            <Payload contentType="application/json">
+                {
+                    "userName": "{private.username}",
+                    "password": "{private.password}",
+                    "outputtype": "Json"
+                }
+            </Payload>
+        </Set>
+        <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    </Request>
+    <Response>calloutResponse</Response>
+    <HTTPTargetConnection>
+        <URL>https://xre-stg.corporate.exelixi.com</URL>
+    </HTTPTargetConnection>
+</ServiceCallout>
+```
+
+---
+
 
