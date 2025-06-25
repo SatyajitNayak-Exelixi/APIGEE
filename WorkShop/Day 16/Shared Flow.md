@@ -15,7 +15,7 @@ Think of it like a **template or function** that can be plugged into multiple AP
 | ♻️ **Reusability**     | Avoid duplicating policies across API proxies              |
 | ⚖️ **Consistency**     | Apply the same logic (e.g., auth, logging) across services |
 | ⛩️ **Maintainability** | Update logic in one place instead of every API proxy       |
-| ⚡ **Performance**      | Reduce design time and keep things organized               |
+| ⚡ **Performance**     | Reduce design time and keep things organized               |
 
 ---
 
