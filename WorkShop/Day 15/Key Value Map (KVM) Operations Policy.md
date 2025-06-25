@@ -14,10 +14,6 @@
 
 When a request comes in, fetch the **username and password** from a KVM and send them to the backend using **Basic Authentication**.
 
-### 🧩 KVM Name:
-
-`OSTShipmentRegister`
-
 ### 🔐 Policy 1: Get Username/Password from KVM
 
 ```xml
@@ -56,13 +52,18 @@ When a request comes in, fetch the **username and password** from a KVM and send
 
 You store **country codes and their corresponding regions** in a KVM (e.g. `AU → APAC`, `US → AMER`) and route requests based on the region.
 
-### 🧩 KVM Name:
+### 🔐 Policy 1: JavaScript to get the Country code from the header.
 
-`FAMLanding`
+```javascript
+var CountryCode = context.getVariable("request.header.CountryCode");
+if (CountryCode) {
+    context.setVariable("CountryCode", CountryCode.toUpperCase());
+}
+```
 
-### 🔐 Policy 1: Get Region from KVM
+---
 
-📷 *Example KVM mapping country codes to regions used in routing logic.*
+### 🔐 Policy 2: Get Region from KVM
 
 ```xml
 <<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -84,7 +85,7 @@ You store **country codes and their corresponding regions** in a KVM (e.g. `AU �
 
 ---
 
-### 🚦 Policy 2: Route Based on Region
+### 🚦 Condition: Route Based on Region
 
 ```xml
 <RouteRule name="AMER">
