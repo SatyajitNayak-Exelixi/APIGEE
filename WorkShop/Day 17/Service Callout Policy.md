@@ -5,6 +5,30 @@ The **Service Callout** policy in Apigee allows an API proxy to call an external
 
 ---
 
+## 🧩 Types of Callouts in Apigee
+
+### 1. ✅ **HTTP Callout (Standard)**
+- Used to make HTTP calls to any external URL (e.g., https://auth.server.com/token)
+- Suitable for token generation, third-party APIs, etc.
+
+### 2. 🔁 **Proxy Chaining**
+- Call another Apigee proxy deployed in the same environment.
+- Helps **reuse common logic** like logging, authentication, or transformation.
+- URL format: `http://localhost:8998/v1/organizations/{org}/environments/{env}/apis/{proxy}/revisions/{rev}`  
+  Or better, use `http://{proxy-name}.{env}.apigee.net` if exposed externally.
+
+**Use Case:** Call a shared proxy to generate a JWT, validate user, or centralize error handling.
+
+### 3. 🔗 **Path Chaining**
+- Directly call a **specific resource path** from a different proxy.
+- Useful for routing requests through different paths or resources without changing hostnames.
+
+**Example URL:**  
+`http://my-proxy.apigee.net/shared/jwt/generate`  
+Here, `/shared/jwt/generate` is the path chained to another internal route.
+
+---
+
 ## 🔥 Real-Time Scenario: Token Generation with KVM-Stored Credentials
 
 ### 🎯 Objective:
