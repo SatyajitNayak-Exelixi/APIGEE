@@ -40,7 +40,7 @@ This condition checks if the incoming request method is `OPTIONS`. If true, it t
             <Headers>
                 <Header name="Access-Control-Allow-Origin">{request.header.Origin}</Header>
                 <Header name="Access-Control-Allow-Headers">access-control-allow-origin,authorization,content-type,correlationid,countrycode,im-acceptlanguage,im-correlationid,im-countrycode,im-environment,im-microfrontendid,im-senderid,im-sitecode,podiosubvendorid,im-userid,isocountrycode, *</Header>
-                <Header name="Access-Control-Allow-Methods">GET, HEAD, POST, PUT, DELETE, OPTIONS, PATCH, COPY, LINK, UNLINK, PURGE, VIEW</Header>
+                <Header name="Access-Control-Allow-Methods">GET, HEAD, POST, PUT, DELETE, OPTIONS, PATCH</Header>
                 <Header name="Access-Control-Allow-Credentials">true</Header>
                 <Header name="Access-Control-Max-Age">1800</Header>
                 <Header name="Vary">Origin</Header>

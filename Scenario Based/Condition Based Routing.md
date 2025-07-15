@@ -1,87 +1,80 @@
-# 🎯 Condition-Based Routing in Apigee
+# 🚀 Apigee Condition-Based Routing.
 
-## 🚀 Overview
-Condition-based routing in Apigee enables API traffic to be directed based on request parameters, headers, and paths. This helps in implementing flexible routing logic based on business needs.
+In this tutorial, we’ll explore how to route traffic to different targets based on:
+
+1. `proxy.pathsuffix`
+2. `request.header`
+3. `request.queryparam`
+
+Above are the major routing logic we use on a regular basic! 👨‍🏫📘
 
 ---
 
-## 🛠️ Scenario 1: Path Suffix-Based Routing
-**🔹 Requirement:** Extract the path suffix and route the request accordingly.
+## 🎯 What is Condition-Based Routing?
 
-**📝 Condition:**
+In Apigee, you can define routing logic using `<RouteRule>` blocks inside your `ProxyEndpoint.xml`.  
+These conditions decide **which target endpoint** the request should hit.
+
+---
+
+## 🔧 Unified Example: Route Rules with All 3 Conditions
+
 ```xml
-<Condition>proxy.pathsuffix MatchesPath "/*/news-scorecard"</Condition>
+<!-- 🔹 Routing Based on Path Suffix -->
+<RouteRule name="Route-Flipkart-Path">
+    <TargetEndpoint>Flipkart</TargetEndpoint>
+    <Condition>proxy.pathsuffix MatchesPath "/Flipkart"</Condition>
+</RouteRule>
+
+<RouteRule name="Route-Myntra-Path">
+    <TargetEndpoint>Myntra</TargetEndpoint>
+    <Condition>proxy.pathsuffix MatchesPath "/Myntra"</Condition>
+</RouteRule>
+
+<RouteRule name="Route-Amazon-Path">
+    <TargetEndpoint>Amazon</TargetEndpoint>
+    <Condition>proxy.pathsuffix MatchesPath "/Amazon"</Condition>
+</RouteRule>
+
+<!-- 🔹 Routing Based on Header -->
+<RouteRule name="Route-Flipkart-Header">
+    <TargetEndpoint>Flipkart</TargetEndpoint>
+    <Condition>request.header.Site-ID = "Flipkart"</Condition>
+</RouteRule>
+
+<RouteRule name="Route-Myntra-Header">
+    <TargetEndpoint>Myntra</TargetEndpoint>
+    <Condition>request.header.Site-ID = "Myntra"</Condition>
+</RouteRule>
+
+<!-- 🔹 Routing Based on Query Parameter -->
+<RouteRule name="Route-Flipkart-QueryParam">
+    <TargetEndpoint>Flipkart</TargetEndpoint>
+    <Condition>request.queryparam.SiteID = "Flipkart"</Condition>
+</RouteRule>
+
+<RouteRule name="Route-Amazon-QueryParam">
+    <TargetEndpoint>Amazon</TargetEndpoint>
+    <Condition>request.queryparam.SiteID = "Amazon"</Condition>
+</RouteRule>
 ```
-
-**✅ Explanation:**
-- The `proxy.pathsuffix` variable extracts the last part of the request URL.
-- The `MatchesPath "/*/news-scorecard"` condition ensures that requests matching this pattern are routed accordingly.
-- Example:
-  - **Request:** `https://api.example.com/v1/sports/news-scorecard`
-  - **Extracted Suffix:** `/v1/news-scorecard`
-  - **Routing Decision:** Forward request to the backend responsible for handling news scorecards.
-
-📌 **Use Case:** Sports API routing for news scorecards.
-
 ---
 
-## 🛠️ Scenario 2: Header-Based Routing
-**🔹 Requirement:** Reject requests from a specific origin.
+## 🔧 Assign Message : To block the additional Params
 
-**📝 Condition:**
 ```xml
-<Condition>request.header.origin != "https://demo-beta.ingrammicro.com"</Condition>
+<!-- 🔹 Add this Assign message in the Pre flow of the targer to remove the addition Params befor hitting the Target URL  -->
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage async="false" continueOnError="false" enabled="true" name="AM- Remove Path Suffix">
+    <DisplayName>AM- Remove Path Suffix </DisplayName>
+    <Properties/>
+    <AssignVariable>
+        <Name>target.copy.pathsuffix</Name>
+        <Value>false</Value>
+        <Ref/>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>
 ```
-
-**✅ Explanation:**
-- The `request.header.origin` fetches the value of the `Origin` header.
-- The `!=` operator ensures that requests from `https://demo-beta.ingrammicro.com` are blocked or handled differently.
-- Example:
-  - **Request 1:**
-    - **Origin:** `https://demo-beta.ingrammicro.com` ❌ **Blocked**
-  - **Request 2:**
-    - **Origin:** `https://allowed-origin.com` ✅ **Allowed**
-
-📌 **Use Case:** Security enforcement to prevent cross-origin requests from unauthorized sources.
-
----
-
-## 🛠️ Scenario 3: Query Parameter-Based Routing
-**🔹 Requirement:** Route requests based on query parameters.
-
-**📝 Condition:**
-```xml
-<Condition>request.queryparam.type = "premium"</Condition>
-```
-
-**✅ Explanation:**
-- The `request.queryparam.type` extracts the `type` query parameter from the request.
-- If `type` equals `premium`, route the request to a premium service backend.
-- Example:
-  - **Request 1:** `https://api.example.com/news?type=premium` ✅ **Route to Premium News Service**
-  - **Request 2:** `https://api.example.com/news?type=free` ✅ **Route to Free News Service**
-
-📌 **Use Case:** Implementing tier-based API access (Free vs. Premium users).
-
----
-
-## 🎨 Visual Representation
-![Condition-Based Routing](https://via.placeholder.com/800x400.png?text=Condition-Based+Routing+in+Apigee)
-
----
-
-## 📌 Summary
-| Scenario | Condition | Use Case |
-|----------|-----------|----------|
-| Path Suffix-Based | `proxy.pathsuffix MatchesPath "/*/news-scorecard"` | Routing news scorecard requests |
-| Header-Based | `request.header.origin != "https://demo-beta.ingrammicro.com"` | Blocking unauthorized origins |
-| Query Param-Based | `request.queryparam.type = "premium"` | Routing based on user type |
-
----
-
-## 🔗 Further Reading
-- [Apigee Condition-Based Routing Docs](https://cloud.google.com/apigee/docs/api-platform/reference/policies/flow-variables)
-- [Apigee API Proxy Routing](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis)
-
-🚀 **Happy Learning!**
-
