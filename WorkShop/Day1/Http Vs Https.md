@@ -16,7 +16,7 @@ http://www.example.com
 ---
 
 ## :lock: What is HTTPS?
-**HyperText Transfer Protocol Secure (HTTPS)** is the secure version of HTTP, using encryption for safe communication.
+**HyperText Transfer Protocol Secure (HTTPS)** is the secure version of HTTP, using encryption for safe communication.It is the secure version of HTTP, where data between your browser and the server is encrypted.
 
 ### :point_right: Characteristics:
 - Uses **SSL/TLS** encryption to protect data.
