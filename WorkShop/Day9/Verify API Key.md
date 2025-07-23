@@ -96,8 +96,8 @@ HTTP/1.1 401 Unauthorized
 ## 🎯 Summary Table
 | API Key Location  | Purpose                           | Apigee Policy           |
 |------------------|---------------------------------|------------------------|
-| Request Header  | Ensures secure transmission      | `VerifyAPIKey`         |
-| Query Parameter | Alternative way to send API Key | `VerifyAPIKey-QueryParam` |
+| Request Header  | E   | `VerifyAPIKey`         |
+| Query Parameter | nsures secure transmission   Alternative way to send API Key | `VerifyAPIKey-QueryParam` |
 
 ---
 
