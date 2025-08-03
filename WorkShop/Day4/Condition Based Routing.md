@@ -66,14 +66,12 @@ These conditions decide **which target endpoint** the request should hit.
 <!-- 🔹 Add this Assign message in the Pre flow of the targer to remove the addition Params befor hitting the Target URL  -->
 
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<AssignMessage async="false" continueOnError="false" enabled="true" name="AM- Remove Path Suffix">
-    <DisplayName>AM- Remove Path Suffix </DisplayName>
+<AssignMessage continueOnError="false" enabled="true" name="RemoveQueryParams">
+    <DisplayName>RemoveQueryParams</DisplayName>
     <Properties/>
-    <AssignVariable>
-        <Name>target.copy.pathsuffix</Name>
-        <Value>false</Value>
-        <Ref/>
-    </AssignVariable>
+    <Remove>
+        <QueryParams/>
+    </Remove>
     <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
     <AssignTo createNew="false" transport="http" type="request"/>
 </AssignMessage>
