@@ -84,7 +84,7 @@ if (username !== expectedUsername || password !== expectedPassword) {
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <RaiseFault async="false" continueOnError="false" enabled="true" name="RF-AuthError">
-    <DisplayName>RF-AuthError</DisplayName>
+    <DisplayName>RF-AuthenticationError</DisplayName>
     <Properties/>
     <FaultResponse>
         <Set>
