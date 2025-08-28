@@ -11,115 +11,41 @@ The **`RegularExpressionProtection`** policy in Apigee helps safeguard your APIs
 
 ## 🔹 **Basic Usage of `RegularExpressionProtection`**
 
-This example demonstrates the usage of the `RegularExpressionProtection` policy to block common malicious patterns like **XSS** and **SQL injections**.
+The RegularExpressionProtection policy helps secure your API by blocking requests that contain malicious patterns, such as SQL injection or XSS attempts.
 
 ```xml
-<RegularExpressionProtection name="RegExProtection">
-  <FaultRules>
-    <FaultRule name="InvalidPattern">
-      <Condition>request.queryparam.regex_match == "true"</Condition>
-      <Response>
-        <StatusCode>400</StatusCode>
-        <Message>🚫 Request contains invalid patterns.</Message>
-      </Response>
-    </FaultRule>
-  </FaultRules>
-  <Patterns>
-    <Pattern>.*<script>.*</Pattern> <!-- Block XSS Script tags -->
-    <Pattern>.*--.*</Pattern> <!-- Block SQL Injection -->
-  </Patterns>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RegularExpressionProtection async="false" continueOnError="false" enabled="true" name="RegexProtection">
+    <DisplayName>RegexProtection</DisplayName>
+    <Source>request</Source>
+    <!-- Block attacks in URI path -->
+    <URIPath>
+        <Pattern><![CDATA[(?i)(delete|exec|drop\s*table|insert|update|shutdown|\bor\b)]]></Pattern>
+    </URIPath>
+    <!-- Block attacks in query string -->
+    <Variable name="request.querystring">
+        <Pattern><![CDATA[(?i)(delete|exec|drop\s*table|insert|update|shutdown|\bor\b)]]></Pattern>
+    </Variable>
+    <!-- Block attacks in form body -->
+    <Variable name="request.formstring">
+        <Pattern><![CDATA[(?i)(delete|exec|drop\s*table|insert|update|shutdown|\bor\b)]]></Pattern>
+    </Variable>
 </RegularExpressionProtection>
 ```
 
 ✅ **What this does:**
-- Blocks requests containing **XSS** attack vectors (`<script>` tags).
-- Blocks SQL injection attempts using `--`.
+🚫 Blocks requests with SQL injection keywords (e.g., DROP TABLE, DELETE, UPDATE, etc.) in the URI, query string, or form parameters.
+🚫 Prevents basic XSS attempts such as <script> tags if you extend the regex to include them.
+✅ Ensures only clean traffic is passed through to the backend.
 
 ---
 
-## 🛠 **Validating Patterns in XML, JSON, and Form Payloads**
+**How to Test this:**
 
-The `RegularExpressionProtection` policy can validate different content types like **XML**, **JSON**, and **form parameters**. Here's how:
-
-### 📌 **1. XML Payload Validation**
-```xml
-<RegularExpressionProtection name="XMLPayloadRegex">
-  <Patterns>
-    <Pattern>.*<script>.*</Pattern> <!-- Block XSS -->
-  </Patterns>
-  <Condition>request.body.content-type == "application/xml"</Condition>
-  <Response>
-    <StatusCode>400</StatusCode>
-    <Message>🚨 XML Payload contains invalid pattern.</Message>
-  </Response>
-</RegularExpressionProtection>
 ```
-
-### 📌 **2. JSON Payload Validation**
-```xml
-<RegularExpressionProtection name="JSONPayloadRegex">
-  <Patterns>
-    <Pattern>.*<script>.*</Pattern> <!-- Block XSS -->
-  </Patterns>
-  <Condition>request.body.content-type == "application/json"</Condition>
-  <Response>
-    <StatusCode>400</StatusCode>
-    <Message>🚨 JSON Payload contains invalid pattern.</Message>
-  </Response>
-</RegularExpressionProtection>
-```
-
-### 📌 **3. Form Parameters Validation**
-```xml
-<RegularExpressionProtection name="FormParamRegex">
-  <Patterns>
-    <Pattern>.*<script>.*</Pattern> <!-- Block XSS -->
-  </Patterns>
-  <Condition>request.body.content-type == "application/x-www-form-urlencoded"</Condition>
-  <Response>
-    <StatusCode>400</StatusCode>
-    <Message>⚠️ Form parameters contain invalid pattern.</Message>
-  </Response>
-</RegularExpressionProtection>
+https://<Hostname>/deleteUser
+https://<Hostname>/demoapi?name=insert
 ```
 
 ---
-
-## 🌍 **Real-time Scenario: Content Filtering in E-commerce Contact Forms**
-
-Imagine you have an **e-commerce platform** with a **contact form** where users submit inquiries. To prevent **malicious scripts** or **SQL injections**, use the `RegularExpressionProtection` policy:
-
-```xml
-<RegularExpressionProtection name="ContactFormRegexProtection">
-  <Patterns>
-    <Pattern>.*<script>.*</Pattern> <!-- Block XSS -->
-    <Pattern>.*DROP.*TABLE.*</Pattern> <!-- Block SQL Injection -->
-  </Patterns>
-  <Condition>request.body.content-type == "application/x-www-form-urlencoded"</Condition>
-  <Response>
-    <StatusCode>400</StatusCode>
-    <Message>⚠️ Your message contains invalid content.</Message>
-  </Response>
-</RegularExpressionProtection>
-```
-
-🔹 **What This Does:**
-- **Blocks** submissions containing **XSS** attack patterns.
-- **Prevents** SQL injection attacks like `DROP TABLE`.
-
----
-
-## ✅ **Summary**
-
-🚀 The `RegularExpressionProtection` policy is a crucial tool for securing your APIs. By filtering out malicious patterns in **XML**, **JSON**, and **form data**, it ensures that your backend remains safe from common threats like **XSS** and **SQL injections**.
-
----
-
-## 🔑 **Key Takeaways:**
-- 🛡️ Use **RegularExpressionProtection** to block harmful patterns.
-- 📂 Configure it for **XML**, **JSON**, and **form data** payloads.
-- 🔥 Protect your system from **XSS** and **SQL injection**.
-- ✨ Customize it based on your application’s needs.
-
-💡 Let me know if you need further customization! 🚀
 
