@@ -54,8 +54,6 @@ curl --location 'https://<HostName>/demoapi' \
 }'
 ```
 
----
-
 ✅ The **JSONThreatProtection** policy ensures that such **excessive payloads** are **blocked** before reaching backend services.
 
 ---
@@ -80,7 +78,7 @@ curl --location 'https://<HostName>/demoapi' \
     </FaultResponse>
 </XMLThreatProtection>
 ```
----
+
 ✅ The **XMLThreatProtection** policy **blocks** such malicious payloads.
 
 
