@@ -16,7 +16,52 @@ These policies help in **validating payload size, element depth, and node count*
 
 ---
 
-## 📌 **1. XML Threat Protection**
+## 📌 **1. JSON Threat Protection**
+
+**JSON Threat Protection** prevents **overly large, deeply nested, or malformed JSON payloads** from causing API disruptions.
+
+### 🛠 **Example Policy for JSON Threat Protection**
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<JSONThreatProtection async="false" continueOnError="false" enabled="true" name="JSON-Threat-Protection-1">
+    <DisplayName>JSON Threat Protection-1</DisplayName>
+    <Properties/>
+    <ArrayElementCount>2</ArrayElementCount>
+    <ContainerDepth>2</ContainerDepth>
+    <ObjectEntryCount>10</ObjectEntryCount>
+    <ObjectEntryNameLength>10</ObjectEntryNameLength>
+    <Source>request</Source>
+    <StringValueLength>50</StringValueLength>
+</JSONThreatProtection>
+```
+
+**How to Test:**
+
+```
+curl --location 'https://<HostName>/demoapi' \
+--header 'Content-Type: application/json' \
+--data '{
+  "a":{"b":{"c":{"d":{"e":{"f":"too deep"}}}}}
+}'
+```
+
+```
+curl --location 'https://<HostName>/demoapi' \
+--header 'Content-Type: application/json' \
+--data '{
+  "field": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}'
+```
+
+---
+
+✅ The **JSONThreatProtection** policy ensures that such **excessive payloads** are **blocked** before reaching backend services.
+
+---
+
+
+## 📌 **2. XML Threat Protection**
 
 **XML Threat Protection** prevents malicious XML payloads from overwhelming or exploiting an API.
 
@@ -35,68 +80,9 @@ These policies help in **validating payload size, element depth, and node count*
     </FaultResponse>
 </XMLThreatProtection>
 ```
-
-### 🔥 **Real-time Scenario: Preventing XXE Attacks**
-Imagine you have a **banking API** that accepts XML requests for account details. Attackers can exploit XML processing to read sensitive files from the server (e.g., `/etc/passwd`).
-
-#### 🚨 **Attack Example**
-```xml
-<?xml version="1.0"?>
-<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
-<request>
-    <account>&xxe;</account>
-</request>
-```
+---
 ✅ The **XMLThreatProtection** policy **blocks** such malicious payloads.
 
----
 
-## 📌 **2. JSON Threat Protection**
 
-**JSON Threat Protection** prevents **overly large, deeply nested, or malformed JSON payloads** from causing API disruptions.
-
-### 🛠 **Example Policy for JSON Threat Protection**
-
-```xml
-<JSONThreatProtection name="JSONSecurityPolicy">
-    <MaxDepth>5</MaxDepth> <!-- Restricts JSON nesting depth -->
-    <MaxElementCount>200</MaxElementCount> <!-- Limits the number of elements -->
-    <MaxNodeValueLength>500</MaxNodeValueLength> <!-- Restricts string length -->
-    <FaultResponse>
-        <StatusCode>400</StatusCode>
-        <Message>🚨 JSON Payload exceeds security limits.</Message>
-    </FaultResponse>
-</JSONThreatProtection>
-```
-
-### 🔥 **Real-time Scenario: Preventing DoS with Large JSON Objects**
-Consider an **e-commerce API** where users submit cart details. Attackers may send **massive JSON payloads** to overload the system.
-
-#### 🚨 **Attack Example**
-```json
-{
-  "cart": [
-    {"item": "product1", "quantity": 10000},
-    {"item": "product2", "quantity": 20000},
-    {"item": "product3", "quantity": 30000}
-  ]
-}
-```
-✅ The **JSONThreatProtection** policy ensures that such **excessive payloads** are **blocked** before reaching backend services.
-
----
-
-## ✅ **Summary**
-
-🔹 **XMLThreatProtection** and **JSONThreatProtection** policies prevent security threats by restricting **payload size, depth, and structure**.
-
-🔹 **Common threats mitigated:**
-- 🛡️ **XML Entity Expansion Attacks (XXE)**
-- 🛡️ **Large JSON Payload DoS Attacks**
-- 🛡️ **Deeply Nested Object Attacks**
-
-🔹 **Apigee’s Threat Protection ensures APIs remain**:
-✅ **Secure** | ✅ **Optimized** | ✅ **High-performing**
-
-💡 Let me know if you need further customization! 🚀
 
