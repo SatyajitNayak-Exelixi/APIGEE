@@ -26,7 +26,7 @@ You receive a JSON request with candidate details. You want to **route the reque
 ## 📤 Sample cURL Request with Payload
 
 ```bash
-curl --location 'https://api-te.ingrammicro.com:443/famlanding/LearningApigee' \
+curl --location 'https://<HostName>:Port/demoAPI' \
 --header 'SenderID: FAMLAnding' \
 --header 'Authorization: Basic RmFtbGFuZGluZzpGYW1sYW5kaW5nMTIzNA==' \
 --header 'Content-Type: application/json' \
