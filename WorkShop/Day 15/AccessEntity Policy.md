@@ -43,8 +43,11 @@ Retrieves and validates the API Key from Apigee’s data store.
 Retrieves and validates an OAuth access token.
 
 ```xml
-<AccessEntity name="ValidateOAuthToken">
-    <OAuthToken ref="request.header.Authorization"/>
+<AccessEntity async="false" continueOnError="false" enabled="true" name="AE-GetCustomerVars">
+  <DisplayName>AE-GetCustomerVars</DisplayName>
+  <Properties/>
+  <EntityIdentifier ref="apigee.client_id" type="consumerkey"/>
+  <EntityType value="app"/>
 </AccessEntity>
 ```
 📌 **Use Case:** Extracts the `Authorization` header and validates the OAuth token.
